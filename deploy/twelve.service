@@ -9,7 +9,9 @@ User=uprootiny
 Group=uprootiny
 WorkingDirectory=/home/uprootiny/twelve
 Environment=TWELVE_PORT=47312
-Environment=TWELVE_BIND=127.0.0.1
+# Bind 0.0.0.0 so the service is reachable both via caddy on :443 (loopback)
+# and directly at twelve.solvulator.com:47312 once the GCP firewall opens 47312.
+Environment=TWELVE_BIND=0.0.0.0
 Environment=TWELVE_ROOT=/home/uprootiny
 Environment=TWELVE_HUB2=hub2
 ExecStart=/usr/bin/python3 /home/uprootiny/twelve/twelve.py
