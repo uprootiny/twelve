@@ -1,0 +1,16 @@
+# twelve — workspace walker
+#
+# Append this stanza to /etc/caddy/Caddyfile on nabla, then:
+#   sudo systemctl reload caddy
+#
+# Picks a high uncontested port (47312) so it doesn't fight with cockpit
+# (:9090) or solvulator (:9800). Subdomain is novel: twelve.solvulator.com.
+
+twelve.solvulator.com {
+    reverse_proxy 127.0.0.1:47312
+    encode gzip zstd
+    log {
+        output file /var/log/caddy/twelve.access.log
+        format console
+    }
+}

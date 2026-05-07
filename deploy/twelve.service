@@ -1,0 +1,31 @@
+[Unit]
+Description=twelve — workspace walker
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=uprootiny
+Group=uprootiny
+WorkingDirectory=/home/uprootiny/twelve
+Environment=TWELVE_PORT=47312
+Environment=TWELVE_BIND=127.0.0.1
+Environment=TWELVE_ROOT=/home/uprootiny
+Environment=TWELVE_HUB2=hub2
+ExecStart=/usr/bin/python3 /home/uprootiny/twelve/twelve.py
+Restart=on-failure
+RestartSec=2
+
+# Hardening — twelve only reads, never writes outside its WorkingDirectory
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/uprootiny/twelve
+PrivateTmp=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictNamespaces=yes
+
+[Install]
+WantedBy=multi-user.target
