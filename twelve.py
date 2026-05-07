@@ -63,11 +63,12 @@ def verify() -> dict:
     """Re-run all 12 capacity checks. Returns {id: status_dict}."""
     cards: dict = {}
 
+    sv = ROOT / "solvulator/app/server.py"
     cards["01"] = {
         "label": "Solvulator stdlib backend",
-        "evidence": file_info(ROOT / "solvulator/app/server.py"),
-        "parses": parses(ROOT / "solvulator/app/server.py"),
-        "status": "ok",
+        "evidence": file_info(sv),
+        "parses": parses(sv) if sv.exists() else False,
+        "status": "ok" if sv.exists() and parses(sv) else "fail",
     }
 
     pwa_files = [ROOT / "solvulator/app/index.html",
