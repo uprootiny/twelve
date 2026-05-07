@@ -9,8 +9,4 @@
 twelve.solvulator.com {
     reverse_proxy 127.0.0.1:47312
     encode gzip zstd
-    log {
-        output file /var/log/caddy/twelve.access.log
-        format console
-    }
 }
