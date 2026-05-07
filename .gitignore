@@ -1,0 +1,18 @@
+# Runtime state — never commit
+.twelve.pid
+.twelve.log
+__pycache__/
+*.pyc
+
+# Editor / OS
+.DS_Store
+*.swp
+.vscode/
+.idea/
+
+# Defensive: nothing secret-shaped should ever land here
+*.env
+.env*
+*-key.json
+*credentials*
+*.pem
