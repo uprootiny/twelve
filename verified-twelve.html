@@ -80,7 +80,7 @@
 <header>
   <div>
     <h1><span class="num">12</span> verified-present capacities · bring live now</h1>
-    <div class="meta" id="meta">/Users/uprootiny/Erlich · python 3.9.6 · bb 1.12.218 · node 22.22.1</div>
+    <div class="meta" id="meta">workspace at <span id="meta-root">/Users/uprootiny/Erlich</span> · served from <span id="meta-host">file://</span></div>
   </div>
   <div class="legend">
     <span class="ok">live (runs as-is)</span>
@@ -238,7 +238,7 @@
   <h3>Compositions — what these twelve become together</h3>
 
   <div class="recipe">
-    <div class="name">A · Storyboard live, end-to-end (no LLMs)</div>
+    <div class="name">offline storyboard · backend + UI + corpus, no LLMs</div>
     <div class="what">PWA shell talking to unified backend, serving sample legal corpus through the storyboard's five zoom levels. No external API calls — fully offline-capable demo.</div>
     <div class="uses"><span>04</span><span>03</span><span>07</span><span>02</span></div>
     <pre>python3 hyle-sync/solvulator/src/system.py &amp;
@@ -246,7 +246,7 @@ open hyle-sync/solvulator/static/storyboard.html</pre>
   </div>
 
   <div class="recipe">
-    <div class="name">B · ECA pipeline · scrape → triage → samples</div>
+    <div class="name">ECA scrape→extract→triage · babashka, no LLMs</div>
     <div class="what">Babashka scraper produces notices in the same CSV shape as the pipeline test fixture. Closes the loop from raw ECA data to pipeline-ready input — no LLMs needed.</div>
     <div class="uses"><span>08</span><span>07</span></div>
     <pre>bb lien/scrape.clj          # produces decisions.json/csv
@@ -255,7 +255,7 @@ bb lien/vortices.bb         # triage</pre>
   </div>
 
   <div class="recipe">
-    <div class="name">C · Full agent pipeline · one env-file away</div>
+    <div class="name">full 12-agent pipeline · one env-file away</div>
     <div class="what">12 prompts × runner × sample data — exists, parses, just lacks keys. Recreate ~/.env.openrouter to unlock.</div>
     <div class="uses"><span>05</span><span>06</span><span>07</span></div>
     <pre># once ~/.env.openrouter is restored:
@@ -264,7 +264,7 @@ python3 hyle-sync/solvulator/agents/pipeline.py process \
   </div>
 
   <div class="recipe">
-    <div class="name">D · Two-shell preview (zero-config)</div>
+    <div class="name">side-by-side triage UIs · zero-config browser preview</div>
     <div class="what">Open both triage iterations side-by-side and the PWA shell — instantly comparable, no server, no build.</div>
     <div class="uses"><span>09</span><span>02</span></div>
     <pre>open inbox/solvulator-triage_2.html
@@ -272,7 +272,7 @@ open solvulator/app/index.html</pre>
   </div>
 
   <div class="recipe">
-    <div class="name">E · Sheets-backed pipeline + drift watch</div>
+    <div class="name">sheets-backed pipeline + remote drift watch · the Phase 3 shape</div>
     <div class="what">Backend writes pipeline outputs to Google Sheets (key 12), drift-detector on hub2 (11) reports infra health, storyboard reads live. The full Phase 3 shape — minus the keys gap.</div>
     <div class="uses"><span>04</span><span>12</span><span>11</span><span>03</span></div>
     <pre>python3 hyle-sync/solvulator/src/system.py --sheets rotated-sheets-key.json &amp;
@@ -282,10 +282,9 @@ open hyle-sync/solvulator/static/storyboard.html</pre>
 </section>
 
 <footer>
-  <strong>Verified absent / friction:</strong>
-  <code>~/.env.openrouter</code> missing — blocks LLM cards (06) and any agent-driven composition. Other four <code>/tmp/</code> artifacts on hub2 (analyze-day.sh, obfuscation-tiers.md, onboarding-tier-1.md, verify-amnez*) confirmed gone — only drift-multi-interface.sh survived.
+  <strong>Cards by verification basis</strong> — 01,04,06 = python AST parse · 02,03,09 = file presence + size · 05 = file count exactly 12 · 07 = 3-file presence · 08 = 6-file presence + bb shebang · 10 = package.json present · 11 = ssh stat to hub2 · 12 = key file present. Each call to <code>/verify</code> re-runs all of the above — nothing is cached.
   <br><br>
-  <strong>Cards by verification basis:</strong> 01,04,06 = python parse · 02,03,09 = file size + structure · 05 = file count = 12 · 07 = 3 file presence · 08 = 5 file presence + bb shebang · 10 = package.json · 11 = ssh + size match · 12 = file present.
+  <strong>Friction is not hidden.</strong> Cards in <span class="warn">one-fix-away</span> tell you exactly the missing piece. The walkthrough goal is honest now-state, not a green wall.
 </footer>
 
 <script>
@@ -313,6 +312,10 @@ open hyle-sync/solvulator/static/storyboard.html</pre>
   };
 
   const apply = (data) => {
+    const metaRoot = document.getElementById('meta-root');
+    const metaHost = document.getElementById('meta-host');
+    if (metaRoot && data.root) metaRoot.textContent = data.root;
+    if (metaHost) metaHost.textContent = location.host || 'file://';
     Object.entries(data.cards).forEach(([idx, info]) => {
       const card = cardByIdx[idx];
       if (!card) return;
