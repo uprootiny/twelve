@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Verified Twelve · bring live now</title>
+<style>
+  :root {
+    --bg: #0e1014;
+    --panel: #161a22;
+    --panel-2: #1d2230;
+    --line: #2a3142;
+    --ink: #e6e9ef;
+    --dim: #8a93a6;
+    --ok: #6cd47a;
+    --warn: #f0b86e;
+    --fail: #f06e8a;
+    --link: #7fc4ff;
+    --accent: #b388ff;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); }
+  body { font: 13px/1.5 ui-monospace, "SF Mono", Menlo, monospace; padding: 24px; max-width: 1400px; margin: 0 auto; }
+  header { display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid var(--line); margin-bottom: 24px; flex-wrap: wrap; gap: 8px; }
+  h1 { font-size: 18px; margin: 0; letter-spacing: 0.02em; }
+  h1 .num { color: var(--accent); }
+  .meta { color: var(--dim); font-size: 12px; }
+  .legend { display: flex; gap: 16px; font-size: 11px; color: var(--dim); }
+  .legend span::before { content: "● "; }
+  .legend .ok::before { color: var(--ok); }
+  .legend .warn::before { color: var(--warn); }
+  .legend .fail::before { color: var(--fail); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 14px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 14px; display: flex; flex-direction: column; gap: 10px; position: relative; }
+  .card .idx { position: absolute; top: 10px; right: 12px; color: var(--dim); font-size: 11px; }
+  .card h2 { font-size: 14px; margin: 0; padding-right: 24px; letter-spacing: 0.01em; }
+  .card .status { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 3px; margin-left: 6px; vertical-align: 1px; }
+  .ok { color: var(--ok); }
+  .warn { color: var(--warn); }
+  .fail { color: var(--fail); }
+  .ok-bg { background: rgba(108, 212, 122, 0.12); color: var(--ok); }
+  .warn-bg { background: rgba(240, 184, 110, 0.14); color: var(--warn); }
+  .fail-bg { background: rgba(240, 110, 138, 0.14); color: var(--fail); }
+
+  .evidence { font-size: 11.5px; color: var(--dim); display: grid; gap: 2px; }
+  .evidence code { color: var(--link); }
+  .cmd { background: #0a0c10; border: 1px solid var(--line); border-radius: 4px; padding: 8px 10px; font-size: 12px; color: var(--ink); user-select: all; overflow-x: auto; white-space: nowrap; }
+  .cmd::before { content: "$ "; color: var(--accent); }
+
+  .composes { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+  .composes .chip { font-size: 10.5px; color: var(--dim); border: 1px solid var(--line); padding: 1px 6px; border-radius: 10px; }
+  .composes .chip::before { content: "↔ "; color: var(--accent); }
+
+  .joins { margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--line); }
+  .joins h3 { font-size: 14px; margin: 0 0 12px 0; }
+  .recipe { background: var(--panel-2); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 4px; padding: 12px 14px; margin-bottom: 10px; }
+  .recipe .name { font-size: 13px; color: var(--ink); margin-bottom: 4px; }
+  .recipe .what { font-size: 11.5px; color: var(--dim); margin-bottom: 8px; }
+  .recipe .uses { font-size: 11px; color: var(--dim); margin-bottom: 8px; }
+  .recipe .uses span { display: inline-block; background: rgba(179, 136, 255, 0.10); color: var(--accent); padding: 1px 6px; border-radius: 10px; margin-right: 4px; font-size: 10.5px; }
+  .recipe pre { background: #0a0c10; border: 1px solid var(--line); border-radius: 4px; padding: 8px 10px; margin: 0; font-size: 11.5px; overflow-x: auto; white-space: pre; color: var(--ink); }
+
+  footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--dim); font-size: 11px; }
+  footer code { color: var(--link); }
+  .friction { color: var(--warn); }
+
+  .live-bar { display: flex; align-items: center; gap: 12px; font-size: 11px; color: var(--dim); }
+  .live-bar button { background: var(--panel-2); color: var(--ink); border: 1px solid var(--line); border-radius: 4px; padding: 4px 10px; font: inherit; cursor: pointer; }
+  .live-bar button:hover { border-color: var(--accent); }
+  .live-bar .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dim); display: inline-block; }
+  .live-bar.fresh .dot { background: var(--ok); box-shadow: 0 0 6px var(--ok); }
+  .live-bar.stale .dot { background: var(--warn); }
+  .live-bar.offline .dot { background: var(--fail); }
+  .card.is-fail { border-color: rgba(240, 110, 138, 0.4); }
+  .card.is-warn { border-color: rgba(240, 184, 110, 0.35); }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1><span class="num">12</span> verified-present capacities · bring live now</h1>
+    <div class="meta" id="meta">/Users/uprootiny/Erlich · python 3.9.6 · bb 1.12.218 · node 22.22.1</div>
+  </div>
+  <div class="legend">
+    <span class="ok">live (runs as-is)</span>
+    <span class="warn">live with one fix</span>
+    <span class="fail">blocked</span>
+  </div>
+  <div class="live-bar" id="livebar">
+    <span class="dot"></span>
+    <span id="livestatus">static view — start ./twelve.sh up for live verify</span>
+    <button id="reverify" type="button">re-verify</button>
+  </div>
+</header>
+
+<section class="grid">
+
+  <article class="card">
+    <span class="idx">01</span>
+    <h2>Solvulator stdlib backend <span class="status ok-bg">parses</span></h2>
+    <div class="evidence">
+      <div><code>solvulator/app/server.py</code> · 333 LoC · stdlib only</div>
+      <div>HTTP server, /api/* endpoints, no deps</div>
+    </div>
+    <div class="cmd">python3 solvulator/app/server.py</div>
+    <div class="composes"><span class="chip">02 PWA shell</span><span class="chip">07 sample data</span></div>
+  </article>
+
+  <article class="card">
+    <span class="idx">02</span>
+    <h2>PWA shell (iOS-installable) <span class="status ok-bg">files OK</span></h2>
+    <div class="evidence">
+      <div><code>solvulator/app/index.html</code> · 1003 LoC</div>
+      <div>+ <code>manifest.json</code> + <code>sw.js</code> · ralphex-mode shell</div>
+    </div>
+    <div class="cmd">python3 solvulator/app/server.py  # then open in browser</div>
+    <div class="composes"><span class="chip">01 backend</span><span class="chip">06 unified backend</span></div>
+  </article>
+
+  <article class="card">
+    <span class="idx">03</span>
+    <h2>Storyboard 5-zoom UI <span class="status ok-bg">file:// runnable</span></h2>
+    <div class="evidence">
+      <div><code>hyle-sync/solvulator/static/storyboard.html</code> · 1571 LoC</div>
+      <div>Weave→Timeline→Phase→Context→Deep · pinch-zoom · share-target</div>
+    </div>
+    <div class="cmd">open hyle-sync/solvulator/static/storyboard.html</div>
+    <div class="composes"><span class="chip">06 unified backend</span></div>
+  </article>
+
+  <article class="card">
+    <span class="idx">04</span>
+    <h2>Unified backend (system.py) <span class="status ok-bg">parses</span></h2>
+    <div class="evidence">
+      <div><code>hyle-sync/solvulator/src/system.py</code></div>
+      <div>HTTP + sheet engine + token auth + LLM proxy · :9800</div>
+    </div>
+    <div class="cmd">python3 hyle-sync/solvulator/src/system.py</div>
+    <div class="composes"><span class="chip">03 storyboard</span><span class="chip">07 samples</span><span class="chip">12 sheets key</span></div>
+  </article>
+
+  <article class="card">
+    <span class="idx">05</span>
+    <h2>12 Hebrew agent prompts <span class="status ok-bg">12/12 present</span></h2>
+    <div class="evidence">
+      <div><code>hyle-sync/solvulator/agents/01-intake.md</code> … <code>12-meta-pattern.md</code></div>
+      <div>intake · OCR · operative-extract · legal-structure · weakness · FOI · damages · strategy · draft · verify · dispatch · meta</div>
+    </div>
+    <div class="cmd">ls hyle-sync/solvulator/agents/*.md</div>
+    <div class="composes"><span class="chip">06 pipeline.py</span></div>
+  </article>
+
+  <article class="card">
+    <span class="idx">06</span>
+    <h2>12-agent pipeline runner <span class="status warn-bg">needs ~/.env.openrouter</span></h2>
+    <div class="evidence">
+      <div><code>hyle-sync/solvulator/agents/pipeline.py</code> · parses</div>
+      <div class="friction">~/.env.openrouter MISSING on this machine — needed for OPENROUTER + GEMINI keys</div>
+    </div>
+    <div class="cmd">python3 hyle-sync/solvulator/agents/pipeline.py process hyle-sync/solvulator/test/sample.csv</div>
+    <div class="composes"><span class="chip">05 prompts</span><span class="chip">07 samples</span></div>
+  </article>
+
+  <article class="card">
+    <span class="idx">07</span>
+    <h2>Sample legal corpus <span class="status ok-bg">3 files</span></h2>
+    <div class="evidence">
+      <div><code>test/sample-decision-hcj.txt</code> · HCJ decision</div>
+      <div><code>test/sample-demand-execution.txt</code> · ההוצאה לפועל</div>
+      <div><code>test/sample.csv</code> · pipeline input shape</div>
+    </div>
+    <div class="cmd">ls hyle-sync/solvulator/test/</div>
+    <div class="composes"><span class="chip">06 pipeline</span><span class="chip">08 lien stack</span></div>
+  </article>
+
+  <article class="card">
+    <span class="idx">08</span>
+    <h2>Lien · ECA notice triage (bb) <span class="status ok-bg">5 scripts + ontology</span></h2>
+    <div class="evidence">
+      <div><code>lien/scrape.clj</code> · ECA case scraper (v2)</div>
+      <div><code>lien/extract.bb</code> · notice extractor</div>
+      <div><code>lien/vortices.bb</code> + <code>bbmeta.bb</code> + <code>metabase.bb</code></div>
+      <div><code>lien/ontology.edn</code> · 18 KB structured ontology</div>
+    </div>
+    <div class="cmd">cd lien && bb extract.bb</div>
+    <div class="composes"><span class="chip">07 samples</span></div>
+  </article>
+
+  <article class="card">
+    <span class="idx">09</span>
+    <h2>Self-contained triage UIs <span class="status ok-bg">3× zero-build</span></h2>
+    <div class="evidence">
+      <div><code>inbox/solvulator-triage.html</code> + _1 + _2 · 59 KB each</div>
+      <div>Drop-in browser UI · no server · no build · iterations of same surface</div>
+    </div>
+    <div class="cmd">open inbox/solvulator-triage_2.html</div>
+    <div class="composes"><span class="chip">02 PWA shell</span></div>
+  </article>
+
+  <article class="card">
+    <span class="idx">10</span>
+    <h2>Myclaizer · Vite + React 19 <span class="status ok-bg">scaffold present</span></h2>
+    <div class="evidence">
+      <div><code>hyle-sync/myclaizer/</code> · React 19.2 · mammoth (.docx parsing)</div>
+      <div>handoffs/ · public/ · src/ · vite.config.js</div>
+    </div>
+    <div class="cmd">cd hyle-sync/myclaizer && npm install && npm run dev</div>
+    <div class="composes"><span class="chip">04 unified backend</span></div>
+  </article>
+
+  <article class="card">
+    <span class="idx">11</span>
+    <h2>Drift detector on hub2 <span class="status ok-bg">live remote</span></h2>
+    <div class="evidence">
+      <div><code>hub2:/tmp/drift-multi-interface.sh</code> · 4792 B · May 6</div>
+      <div>Multi-interface drift detector · smoke-tested green prior session</div>
+      <div class="friction">⚠ in /tmp — vulnerable to reboot. Fold into repo.</div>
+    </div>
+    <div class="cmd">ssh hub2 'bash /tmp/drift-multi-interface.sh'</div>
+    <div class="composes"><span class="chip">04 unified backend</span></div>
+  </article>
+
+  <article class="card">
+    <span class="idx">12</span>
+    <h2>Google Sheets service-account key <span class="status ok-bg">file present</span></h2>
+    <div class="evidence">
+      <div><code>rotated-sheets-key.json</code> · workspace root</div>
+      <div>Write capability · for Phase 3 sheet write-back</div>
+    </div>
+    <div class="cmd">cat rotated-sheets-key.json | jq .client_email</div>
+    <div class="composes"><span class="chip">04 unified backend</span></div>
+  </article>
+
+</section>
+
+<section class="joins">
+  <h3>Compositions — what these twelve become together</h3>
+
+  <div class="recipe">
+    <div class="name">A · Storyboard live, end-to-end (no LLMs)</div>
+    <div class="what">PWA shell talking to unified backend, serving sample legal corpus through the storyboard's five zoom levels. No external API calls — fully offline-capable demo.</div>
+    <div class="uses"><span>04</span><span>03</span><span>07</span><span>02</span></div>
+    <pre>python3 hyle-sync/solvulator/src/system.py &amp;
+open hyle-sync/solvulator/static/storyboard.html</pre>
+  </div>
+
+  <div class="recipe">
+    <div class="name">B · ECA pipeline · scrape → triage → samples</div>
+    <div class="what">Babashka scraper produces notices in the same CSV shape as the pipeline test fixture. Closes the loop from raw ECA data to pipeline-ready input — no LLMs needed.</div>
+    <div class="uses"><span>08</span><span>07</span></div>
+    <pre>bb lien/scrape.clj          # produces decisions.json/csv
+bb lien/extract.bb          # extract operative parts
+bb lien/vortices.bb         # triage</pre>
+  </div>
+
+  <div class="recipe">
+    <div class="name">C · Full agent pipeline · one env-file away</div>
+    <div class="what">12 prompts × runner × sample data — exists, parses, just lacks keys. Recreate ~/.env.openrouter to unlock.</div>
+    <div class="uses"><span>05</span><span>06</span><span>07</span></div>
+    <pre># once ~/.env.openrouter is restored:
+python3 hyle-sync/solvulator/agents/pipeline.py process \
+  hyle-sync/solvulator/test/sample.csv</pre>
+  </div>
+
+  <div class="recipe">
+    <div class="name">D · Two-shell preview (zero-config)</div>
+    <div class="what">Open both triage iterations side-by-side and the PWA shell — instantly comparable, no server, no build.</div>
+    <div class="uses"><span>09</span><span>02</span></div>
+    <pre>open inbox/solvulator-triage_2.html
+open solvulator/app/index.html</pre>
+  </div>
+
+  <div class="recipe">
+    <div class="name">E · Sheets-backed pipeline + drift watch</div>
+    <div class="what">Backend writes pipeline outputs to Google Sheets (key 12), drift-detector on hub2 (11) reports infra health, storyboard reads live. The full Phase 3 shape — minus the keys gap.</div>
+    <div class="uses"><span>04</span><span>12</span><span>11</span><span>03</span></div>
+    <pre>python3 hyle-sync/solvulator/src/system.py --sheets rotated-sheets-key.json &amp;
+ssh hub2 'bash /tmp/drift-multi-interface.sh' &amp;
+open hyle-sync/solvulator/static/storyboard.html</pre>
+  </div>
+</section>
+
+<footer>
+  <strong>Verified absent / friction:</strong>
+  <code>~/.env.openrouter</code> missing — blocks LLM cards (06) and any agent-driven composition. Other four <code>/tmp/</code> artifacts on hub2 (analyze-day.sh, obfuscation-tiers.md, onboarding-tier-1.md, verify-amnez*) confirmed gone — only drift-multi-interface.sh survived.
+  <br><br>
+  <strong>Cards by verification basis:</strong> 01,04,06 = python parse · 02,03,09 = file size + structure · 05 = file count = 12 · 07 = 3 file presence · 08 = 5 file presence + bb shebang · 10 = package.json · 11 = ssh + size match · 12 = file present.
+</footer>
+
+<script>
+(() => {
+  const livebar = document.getElementById('livebar');
+  const livestatus = document.getElementById('livestatus');
+  const reverify = document.getElementById('reverify');
+
+  const setBar = (cls, msg) => {
+    livebar.classList.remove('fresh', 'stale', 'offline');
+    livebar.classList.add(cls);
+    livestatus.textContent = msg;
+  };
+
+  const cardByIdx = {};
+  document.querySelectorAll('.card').forEach(card => {
+    const idx = card.querySelector('.idx')?.textContent?.trim();
+    if (idx) cardByIdx[idx] = card;
+  });
+
+  const STATUS_TEXT = {
+    ok:   { text: 'live',           cls: 'ok-bg',   border: '' },
+    warn: { text: 'one fix away',   cls: 'warn-bg', border: 'is-warn' },
+    fail: { text: 'blocked',        cls: 'fail-bg', border: 'is-fail' },
+  };
+
+  const apply = (data) => {
+    Object.entries(data.cards).forEach(([idx, info]) => {
+      const card = cardByIdx[idx];
+      if (!card) return;
+      const badge = card.querySelector('.status');
+      if (!badge) return;
+      const s = STATUS_TEXT[info.status] || STATUS_TEXT.fail;
+      badge.className = 'status ' + s.cls;
+      let label = s.text;
+      if (info.blocker) label += ' · ' + info.blocker;
+      badge.textContent = label;
+      card.classList.remove('is-warn', 'is-fail');
+      if (s.border) card.classList.add(s.border);
+    });
+    const ts = new Date(data.checked_at * 1000).toLocaleTimeString();
+    setBar('fresh', `${data.summary.live} live · ${data.summary.warn} one-fix · ${data.summary.fail} blocked · checked ${ts}`);
+  };
+
+  const verify = async () => {
+    setBar('stale', 'verifying…');
+    try {
+      const r = await fetch('/verify', { cache: 'no-store' });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      apply(await r.json());
+    } catch (e) {
+      setBar('offline', 'static view — server not reachable (' + e.message + ')');
+    }
+  };
+
+  reverify.addEventListener('click', verify);
+  // only auto-verify when served from http(s)://, not file://
+  if (location.protocol.startsWith('http')) verify();
+})();
+</script>
+</body>
+</html>
