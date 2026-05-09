@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Activate the in-tree hooks for this clone (idempotent).
+#   ./.githooks/install
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+git config core.hooksPath .githooks
+echo "core.hooksPath -> .githooks"
+ls -la .githooks/pre-commit .githooks/pre-commit.d/*.sh

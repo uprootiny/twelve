@@ -1,0 +1,16 @@
+name: smoke
+
+# Probes live deploy surfaces. Deliberately not on push — a transient TLS
+# blip shouldn't gate every commit. Runs every 6 hours and on demand.
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe public surfaces
+        run: bash scripts/smoke.sh

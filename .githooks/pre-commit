@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Pre-commit dispatcher.
+# Runs every executable under pre-commit.d/ in alphabetic order, passing the
+# newline-separated list of staged paths via $STAGED. Each subcheck exits 0 on
+# pass, non-zero with a one-line reason on fail. Dispatcher reports all
+# failures (does not short-circuit) and exits 1 if any subcheck failed.
+set -euo pipefail
+LC_ALL=C
+
+HERE="$(cd "$(dirname "$0")" && pwd)"
+STAGED="$(git diff --cached --name-only --diff-filter=ACMR || true)"
+[[ -z "$STAGED" ]] && exit 0
+export STAGED
+
+fail=0
+for hook in "$HERE/pre-commit.d"/*; do
+  [[ -x "$hook" ]] || continue
+  name="${hook##*/}"
+  if out="$("$hook" 2>&1)"; then
+    [[ -n "$out" ]] && printf "  ok   %-22s %s\n" "$name" "$out" || printf "  ok   %s\n" "$name"
+  else
+    printf "  FAIL %s\n" "$name"
+    sed 's/^/       /' <<<"$out"
+    fail=1
+  fi
+done
+exit "$fail"
