@@ -13,7 +13,10 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 red=0
 
 # 1. surfaces from Caddy snippets
-mapfile -t hosts < <(
+hosts=()
+while IFS= read -r host; do
+  hosts+=("$host")
+done < <(
   awk '
     /^[a-z0-9._-]+\.(raindesk\.dev|solvulator\.com|hyperstitious\.org|hyperstitious\.art)[[:space:]]*\{/ {
       sub(/[[:space:]]*\{$/, ""); print
